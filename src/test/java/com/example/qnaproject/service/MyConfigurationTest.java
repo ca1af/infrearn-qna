@@ -8,6 +8,10 @@ import org.springframework.context.annotation.Configuration;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class MyConfigurationTest {
+    /**
+     * Configuration 어노테이션이 붙은 빈들은 스프링이 기본적으로 proxy 를 사용해서 관리한다.
+     * CommonBean <- 의존하는 빈이 2개 이상일 때 같은 CommonBean 이 리턴되도록 보장한다.
+     */
     @Test
     void configuration() {
         AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext();
@@ -47,7 +51,13 @@ class MyConfigurationTest {
         }
     }
 
-    @Configuration
+    /**
+     * proxyBeanMethod 는 프록시를 이용한 bean Method 를 사용할것인지 여부를 결정하게 한다.
+     * SpringBoot 3.x~ Spring core 5.2 ~ 기능. ( 이 경우 "myConfigurationTest" 는 실패 한다 )
+     */
+    @Configuration(proxyBeanMethods = false)
+    // why proxyBeanMethod ? -> 매번 프록시를 만드는 비용을 줄이기 위해서.
+    // -> 중복 빈을 사용하지 않는다면 굳이 사용할 필요가 없으므로
     static class MyConfig {
         @Bean
         Common common(){
