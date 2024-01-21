@@ -19,6 +19,34 @@ class MyConfigurationTest {
         assertThat(bean1.common).isSameAs(bean2.common);
     }
 
+    @Test
+    void proxy_common_method() {
+        // 확장이 아닌 대체 로 동작한다.
+        MyConfigProxy myConfigProxy = new MyConfigProxy();
+
+        Bean1 bean1 = myConfigProxy.bean1();
+        Bean2 bean2 = myConfigProxy.bean2();
+
+        // 완전히 같은 녀석들!
+        assertThat(bean1.common).isSameAs(bean2.common);
+    }
+
+    static class MyConfigProxy extends MyConfig{
+        private Common common;
+
+        /**
+         * 이 작업으로써 매번 부모클래스의 빈을 호출하는 것이 아닌, 필드에 저장된 실제 클래스의 빈을 캐싱하듯 사용 가능하다.
+         * @return this.bean == null ? super.bean() : this.bean;
+         */
+        @Override
+        Common common(){
+            if (this.common == null){
+                this.common = super.common();
+            }
+            return this.common;
+        }
+    }
+
     @Configuration
     static class MyConfig {
         @Bean
